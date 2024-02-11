@@ -25,6 +25,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupClick }) => {
       const token = response.data.token;
       // Save token to localStorage or cookie for future use if needed
       localStorage.setItem('token', token);
+      // Store user ID in session storage
+    
+      const userId = response.data.userId;
+   
+      // Assuming your API response includes the user ID
+      sessionStorage.setItem('userId', userId);
       // Navigate to the dashboard
       router.push('/DashBoard');
     } catch (error) {
@@ -32,6 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupClick }) => {
       // Handle login error (e.g., display error message)
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-black text-white">
@@ -52,7 +59,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupClick }) => {
         </form>
       </div>
       <p className="mt-4">
-        Don't have an account?{' '}
+        Don`t have an account?{' '}
         <span className="cursor-pointer text-green-500 hover:underline" onClick={onSignupClick}>Signup</span>
       </p>
     </div>

@@ -1,5 +1,3 @@
-// signupFunction.js
-
 import { PrismaClient } from '@prisma/client';
 import { hashPassword } from '../../app/backend/services/authService';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -21,9 +19,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Hash the password using the shared function
       const hashedPassword = await hashPassword(password);
 
-      // Create the user in the database
+      // Generate a unique userId
+      const userId = Math.floor(Math.random() * 1000000); // You can use any method to generate a unique userId
+      
+      // Create the user in the database with the generated userId
       await prisma.appUser.create({
         data: {
+          id: userId,
           firstName,
           lastName,
           email,
@@ -32,7 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       console.log('User created successfully');
-      res.status(201).json({ message: 'User created successfully' });
+  
+      res.status(201).json({ message: 'User created successfully', userId }); // Return the generated userId in the response
     } catch (error:any) {
       console.error('Error signing up:', error.message);
       res.status(500).json({ error: 'Failed to sign up' });

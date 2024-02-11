@@ -8,39 +8,38 @@ datasource db {
 }
 
 model AppUser {
-  id        Int     @id @default(autoincrement())  
-  email     String  @unique
+  id        Int      @id @default(autoincrement())  
+  email     String   @unique
   password  String
   firstName String
   lastName  String
-  
-  resumeId     Int? @unique
-  resume       Resume? @relation(fields: [resumeId], references: [id])
+  resumes   Resume[]  // Add this field to establish the relation with Resume
 }
 
 model Resume {
-  id Int @id @default(autoincrement())
-  
-  userId Int?
-  appUser   AppUser? 
+  id           Int         @id @default(autoincrement())
+  appUserId    Int         // This field will represent the ID of the associated AppUser
+  appUser      AppUser     @relation(fields: [appUserId], references: [id])
+  school       String
+  degree       String
+  experiences  Experience[]
+  skills       Skill[]     // This field establishes a many-to-many relationship with Skill
+}
 
-  school   String
-  degree   String
-  skills   String[]
-  experiences Experience[]  
+model Skill {
+  id    Int     @id @default(autoincrement())
+  name  String
+  resumes Resume[]  // This field establishes a many-to-many relationship with Resume
 }
 
 model Experience {
-  id        Int    @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   resumeId  Int
-  resume    Resume @relation(fields: [resumeId], references: [id])
-  
-  title String 
-  company String
-  position String  
-  start DateTime
-  end DateTime?
-  
-  // Additional details    
+  resume    Resume    @relation(fields: [resumeId], references: [id])
+  title     String 
+  company   String
+  position  String  
+  start     DateTime
+  end       DateTime?
   description String
 }

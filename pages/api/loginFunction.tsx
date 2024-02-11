@@ -2,10 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import { verifyPassword } from '../../app/backend/services/authService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
+import withSession from '../../app/backend/services/session';
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { email, password } = req.body;
 
@@ -32,6 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Generate JWT token
       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+      // Store user ID in the session
+   
+      req.session.set('userId', user.id);
+      await req.session.save();
+ 
       res.status(200).json({ token });
     } catch (error) {
       console.error('Error logging in:', error);
@@ -41,3 +47,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end(); // Method Not Allowed
   }
 }
+
+export default withSession(handler);

@@ -23,6 +23,10 @@ const SignupPage: React.FC<SignUpPageProps> = ({ onLoginClick }) => {
     try {
       const response = await axios.post('/api/signupFunction', formData);
       console.log(response.data.message);
+      
+      // Store the generated userId in session storage
+      const userId = response.data.id; // Assuming your API response includes the user ID
+      sessionStorage.setItem('userId', userId);
     } catch (error : any) {
       console.error('Error signing up:', error.response?.data.error || error.message);
       setError(error.response?.data.error || 'Failed to sign up');
