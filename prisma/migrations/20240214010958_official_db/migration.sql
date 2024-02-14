@@ -15,6 +15,9 @@ CREATE TABLE "Resume" (
     "appUserId" INTEGER NOT NULL,
     "school" TEXT NOT NULL,
     "degree" TEXT NOT NULL,
+    "gpa" DECIMAL(65,30),
+    "startDate" TIMESTAMP(3),
+    "endDate" TIMESTAMP(3),
 
     CONSTRAINT "Resume_pkey" PRIMARY KEY ("id")
 );

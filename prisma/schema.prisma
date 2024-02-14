@@ -22,6 +22,9 @@ model Resume {
   appUser      AppUser     @relation(fields: [appUserId], references: [id])
   school       String
   degree       String
+  gpa          Decimal?
+  startDate    DateTime?
+  endDate      DateTime?
   experiences  Experience[]
   skills       Skill[]     // This field establishes a many-to-many relationship with Skill
 }
