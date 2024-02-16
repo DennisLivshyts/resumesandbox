@@ -12,7 +12,15 @@ const CreateResumePage : React.FC = () => {
         endDate: '' 
       });
     const [education,setEducation] = useState<{school:string,degree:string,major:string; gpa: string; startDate: string; endDate: string; }[]>([]);
-    const [experiences, setExperiences] = useState<{position:string;company:string;description:string;aiAssistance:boolean}[]>([]);
+    const [experienceInput, setExperienceInput] = useState({
+      position: '',
+      company: '',
+      startDate: '',
+      endDate: '',
+      description: '',
+      aiAssistance: false
+    });
+    const [experiences, setExperiences] = useState<{position:string,company:string, startDate:String, endDate:String,description:string,aiAssistance:boolean}[]>([]);
     const [showSummaryInput, setShowSummaryInput] = useState<boolean>(false);
     const [summary, setSummary] = useState<string>('');
     const [summaryAiAssistance, setSummaryAiAssistance] = useState<boolean>(false);
@@ -28,9 +36,19 @@ const CreateResumePage : React.FC = () => {
       };
       
 
-    const handleExperienceAdd = (position:string, company:string, description:string, aiAssistance:boolean) => {
-        setExperiences([...experiences,{position,company,description,aiAssistance}]);
-    };
+      const handleExperienceAdd = () => {
+        if (experienceInput.position.trim() !== '' && experienceInput.startDate.trim() !== '' && experienceInput.endDate.trim() !== '' && experienceInput.description.trim() !== '') {
+          setExperiences([...experiences, experienceInput]);
+          setExperienceInput({
+            position: '',
+            company:'',
+            startDate: '',
+            endDate: '',
+            description: '',
+            aiAssistance: false
+          });
+        }
+      };
     
     const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSummary(e.target.value);
@@ -70,11 +88,65 @@ const CreateResumePage : React.FC = () => {
           </ul>
         </div>
 
-        {/* Experiences Column */}
-        <div className="w-1/2">
-          <h2 className="text-lg font-semibold mb-4">Experiences</h2>
-          {/* Experience Input Fields */}
+        <div className="w-full md:w-1/2 mb-8">
+        <h2 className="text-lg font-semibold mb-4">Experiences</h2>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Position"
+            value={experienceInput.position}
+            onChange={(e) => setExperienceInput({ ...experienceInput, position: e.target.value })}
+            className="border border-gray-300 rounded-md px-4 py-2 w-full mb-2"
+          />
+          <div className="flex mb-2">
+            <input
+              type="date"
+              placeholder="Start Date"
+              value={experienceInput.startDate}
+              onChange={(e) => setExperienceInput({ ...experienceInput, startDate: e.target.value })}
+              className="border border-gray-300 rounded-md px-4 py-2 mr-2"
+            />
+            <input
+              type="date"
+              placeholder="End Date"
+              value={experienceInput.endDate}
+              onChange={(e) => setExperienceInput({ ...experienceInput, endDate: e.target.value })}
+              className="border border-gray-300 rounded-md px-4 py-2"
+            />
+          </div>
+          <textarea
+            placeholder="Description"
+            value={experienceInput.description}
+            onChange={(e) => setExperienceInput({ ...experienceInput, description: e.target.value })}
+            className="border border-gray-300 rounded-md px-4 py-2 w-full mb-2"
+          />
+          <label className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              checked={experienceInput.aiAssistance}
+              onChange={(e) => setExperienceInput({ ...experienceInput, aiAssistance: e.target.checked })}
+              className="mr-2"
+            />
+            Use AI assistance
+          </label>
+          <button
+            onClick={handleExperienceAdd}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Add Experience
+          </button>
         </div>
+        <ul>
+          {experiences.map((experience, index) => (
+            <li key={index}>
+              <p>{experience.position}</p>
+              <p>{experience.startDate} - {experience.endDate}</p>
+              <p>{experience.description}</p>
+              <p>AI Assistance: {experience.aiAssistance ? 'Yes' : 'No'}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
 
         {/* Education Column */}
         <div className="w-1/4">
@@ -187,10 +259,19 @@ const CreateResumePage : React.FC = () => {
             type="text"
             placeholder="Enter summary"
             value={summary}
-            onChange={handleResumeChange}
+            onChange={(e) => setSummary(e.target.value)}
             className="border border-gray-300 rounded-md px-4 py-2 mb-2 w-full"
           />
           {/* Checkbox for AI assistance */}
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={summaryAiAssistance}
+              onChange={(e) => setSummaryAiAssistance(e.target.checked)}
+              className="form-checkbox h-4 w-4 text-blue-500"
+            />
+            <span className="ml-2">Use AI to improve summary</span>
+          </label>
           <button
             onClick={() => setShowSummaryInput(false)}
             className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
@@ -206,6 +287,11 @@ const CreateResumePage : React.FC = () => {
         className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
       >
         Add Summary
+        {showSummaryInput && (
+          <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-md absolute top-full left-1/2 transform -translate-x-1/2 opacity-90">
+            Add a summary at the top of your resume. It's generally a good idea if you are more experienced in the industry.
+          </span>
+        )}
       </button>
 
       {/* Submit Button */}
