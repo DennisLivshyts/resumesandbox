@@ -30,26 +30,46 @@ const CreateResumePage : React.FC = () => {
         setSkillInput('');
     };
 
+    const handleSkillRemove = (index: number) => {
+      const updatedSkills = [...skills];
+      updatedSkills.splice(index, 1);
+      setSkills(updatedSkills);
+    };
+
     const handleEducationAdd = (school: string, degree: string, major: string, gpa: string, startDate: string, endDate: string) => {
         setEducation([...education, { school, degree, major, gpa, startDate, endDate }]);
         setEducationInput({ school: '', degree: '', major: '', gpa: '', startDate: '', endDate: '' });
       };
-      
-
-      const handleExperienceAdd = () => {
-        if (experienceInput.position.trim() !== '' && experienceInput.startDate.trim() !== '' && experienceInput.endDate.trim() !== '' && experienceInput.description.trim() !== '') {
-          setExperiences([...experiences, experienceInput]);
-          setExperienceInput({
-            position: '',
-            company:'',
-            startDate: '',
-            endDate: '',
-            description: '',
-            aiAssistance: false
-          });
-        }
-      };
     
+    const handleEducationRemove = (index: number) => {
+      const updatedEducation = [...education];
+      updatedEducation.splice(index, 1);
+      setEducation(updatedEducation);
+    };
+    
+    const handleExperienceAdd = () => {
+      if (experienceInput.position.trim() !== '' && experienceInput.startDate.trim() !== '' && experienceInput.endDate.trim() !== '' && experienceInput.description.trim() !== '') {
+        setExperiences([...experiences, experienceInput]);
+        setExperienceInput({
+          position: '',
+          company:'',
+          startDate: '',
+          endDate: '',
+          description: '',
+          aiAssistance: false
+        });
+      }
+    };
+
+    const handleExperienceRemove = (index: number) => {
+      const updatedExperiences = [...experiences];
+      updatedExperiences.splice(index, 1);
+      setExperiences(updatedExperiences);
+    };
+    
+ 
+    
+  
     const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSummary(e.target.value);
     };
@@ -79,13 +99,14 @@ const CreateResumePage : React.FC = () => {
               +
             </button>
           </div>
-          <ul className="mt-4">
-            {skills.map((skill, index) => (
-              <li key={index} className="mb-2">
-                {skill}
-              </li>
-            ))}
-          </ul>
+            <div className="flex flex-wrap">
+              {skills.map((skill, index) => (
+              <div key={index} className="bg-blue-500 text-gray-700 px-3 py-1 rounded-full mr-2 mb-2 flex items-center">
+              <span className="mr-2">{skill}</span>
+              <button className="text-white" onClick={() => handleSkillRemove(index)}>x</button>
+              </div>
+              ))}
+            </div>
         </div>
 
         <div className="w-full md:w-1/2 mb-8">
@@ -143,6 +164,7 @@ const CreateResumePage : React.FC = () => {
               <p>{experience.startDate} - {experience.endDate}</p>
               <p>{experience.description}</p>
               <p>AI Assistance: {experience.aiAssistance ? 'Yes' : 'No'}</p>
+              <button onClick={() => handleExperienceRemove(index)} className="text-red-500">x</button>
             </li>
           ))}
         </ul>
@@ -245,6 +267,7 @@ const CreateResumePage : React.FC = () => {
             {education.map((item, index) => (
               <li key={index} className="mb-2">
                 {item.school} - {item.degree} - {item.major}
+                <button onClick={() => handleEducationRemove(index)} className="ml-2 text-red-500">x</button>
               </li>
             ))}
           </ul>
