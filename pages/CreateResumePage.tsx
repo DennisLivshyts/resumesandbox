@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 const CreateResumePage : React.FC = () => {
+    const [userId, setUserId] = useState<string | null>(null);
     const [skillInput, setSkillInput] = useState('');
     const [skills,setSkills] = useState<string[]> ([]);
     const [educationInput, setEducationInput] = useState({
@@ -24,7 +26,22 @@ const CreateResumePage : React.FC = () => {
     const [showSummaryInput, setShowSummaryInput] = useState<boolean>(false);
     const [summary, setSummary] = useState<string>('');
     const [summaryAiAssistance, setSummaryAiAssistance] = useState<boolean>(false);
-
+    useEffect(() => {
+      // Fetch user ID when the component mounts
+      const fetchUserId = async () => {
+          try {
+              // Retrieve the user's ID from session storage
+              const storedUserId = sessionStorage.getItem('userId');
+              if (!storedUserId) {
+                  throw new Error('User ID not found in session storage');
+              }
+              setUserId(storedUserId);
+          } catch (error) {
+              console.error('Error fetching user ID:', error);
+          }
+      };
+      fetchUserId();
+  }, []);
     const handleSkillAdd = (skill:string)=>{
         setSkills([...skills,skill]);
         setSkillInput('');
@@ -48,7 +65,16 @@ const CreateResumePage : React.FC = () => {
     };
     
     const handleExperienceAdd = () => {
-      if (experienceInput.position.trim() !== '' && experienceInput.startDate.trim() !== '' && experienceInput.endDate.trim() !== '' && experienceInput.description.trim() !== '') {
+      console.log('Adding experience...');
+      if (
+        experienceInput.position.trim() !== '' &&
+        experienceInput.startDate.trim() !== '' &&
+        experienceInput.endDate.trim() !== '' &&
+        experienceInput.description.trim() !== ''
+      ) {
+        console.log('Start Date:', experienceInput.startDate); // Log start date
+        console.log('End Date:', experienceInput.endDate); // Log end date
+    
         setExperiences([...experiences, experienceInput]);
         setExperienceInput({
           position: '',
@@ -60,6 +86,7 @@ const CreateResumePage : React.FC = () => {
         });
       }
     };
+    
 
     const handleExperienceRemove = (index: number) => {
       const updatedExperiences = [...experiences];
@@ -74,12 +101,42 @@ const CreateResumePage : React.FC = () => {
         setSummary(e.target.value);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-    };
+    const handleSubmit = async () => {
+      
+      
+      try {
+          const requestBody = {
+              userId,
+              skills,
+              education,
+              experiences,
+              summary
+          };
+
+          const response = await axios.post('/api/addResumeData', requestBody);
+
+          if (!response.data.success) {
+              throw new Error('Failed to add resume data');
+          }
+
+          // Reset form state after successful submission
+          setSkills([]);
+          setEducation([]);
+          setExperiences([]);
+          setSummary('');
+          setSummaryAiAssistance(false);
+          setShowSummaryInput(false);
+
+          // Optionally, redirect to another page after successful submission
+          // window.location.href = '/success-page';
+      } catch (error) {
+          console.error('Error:', error);
+          // Handle error
+      }
+  };
 
     return (
-        <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8">
       <div className="flex justify-center items-start space-x-8">
         {/* Skills Column */}
         <div className="w-1/4">
@@ -108,10 +165,17 @@ const CreateResumePage : React.FC = () => {
               ))}
             </div>
         </div>
-
+         {/* Experience  Column */}     
         <div className="w-full md:w-1/2 mb-8">
         <h2 className="text-lg font-semibold mb-4">Experiences</h2>
         <div className="mb-4">
+        <input
+            type="text" // Change input type to text
+            placeholder="Company" // Add placeholder for company
+            value={experienceInput.company} // Connect value to experienceInput.company
+            onChange={(e) => setExperienceInput({ ...experienceInput, company: e.target.value })} // Update company value in experienceInput
+            className="border border-gray-300 rounded-md px-4 py-2 w-full mb-2" // Maintain styling
+          />
           <input
             type="text"
             placeholder="Position"
@@ -161,6 +225,7 @@ const CreateResumePage : React.FC = () => {
           {experiences.map((experience, index) => (
             <li key={index}>
               <p>{experience.position}</p>
+              <p>{experience.company}</p> {/* Display company */}
               <p>{experience.startDate} - {experience.endDate}</p>
               <p>{experience.description}</p>
               <p>AI Assistance: {experience.aiAssistance ? 'Yes' : 'No'}</p>
@@ -169,6 +234,7 @@ const CreateResumePage : React.FC = () => {
           ))}
         </ul>
       </div>
+
 
         {/* Education Column */}
         <div className="w-1/4">
@@ -266,7 +332,7 @@ const CreateResumePage : React.FC = () => {
           <ul className="mt-4">
             {education.map((item, index) => (
               <li key={index} className="mb-2">
-                {item.school} - {item.degree} - {item.major}
+                {item.school} - {item.degree} - {item.major} - {item.gpa} - {item.startDate} - {item.endDate}
                 <button onClick={() => handleEducationRemove(index)} className="ml-2 text-red-500">x</button>
               </li>
             ))}
@@ -312,7 +378,7 @@ const CreateResumePage : React.FC = () => {
         Add Summary
         {showSummaryInput && (
           <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-md absolute top-full left-1/2 transform -translate-x-1/2 opacity-90">
-            Add a summary at the top of your resume. It's generally a good idea if you are more experienced in the industry.
+            Add a summary at the top of your resume. Its generally a good idea if you are more experienced in the industry.
           </span>
         )}
       </button>
@@ -320,7 +386,7 @@ const CreateResumePage : React.FC = () => {
       {/* Submit Button */}
       <button
         type="submit"
-        
+        onClick={handleSubmit}
         className="bg-green-500 text-white px-4 py-2 rounded-md mt-4 block mx-auto"
       >
         Submit

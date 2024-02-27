@@ -6,32 +6,35 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const { userId, school, degree, skills, experiences } = req.body;
+      const { userId, school, degree, skills, experiences, summary } = req.body;
 
       // Create an array of skill objects
       const skillObjects = skills.map((skillName: string) => ({
         name: skillName,
       }));
 
-      // Find the AppUser based on the userId
-      const user = await prisma.appUser.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      // Create the resume and associate skills with it
+      // Create the resume and associate skills and experiences with it
       const newResume = await prisma.resume.create({
         data: {
           appUser: { connect: { id: userId } },
           school,
           degree,
-          skills: { create: skillObjects },
-          experiences: { createMany: { data: experiences } },
+           // Include summary if available
+          skills: { create: skillObjects }, // Create skills if they don't exist
+          experiences: {
+            createMany: {
+              data: experiences.map((exp: any) => ({
+                title: exp.title,
+                company: exp.company,
+                position: exp.position,
+                start: new Date(exp.start),
+                end: exp.end ? new Date(exp.end) : undefined,
+                description: exp.description,
+              })),
+            },
+          },
         },
-        include: { skills: true }, // Include the created skills in the response
+        include: { skills: true, experiences: true }, // Include the created skills and experiences in the response
       });
 
       res.status(200).json(newResume);
