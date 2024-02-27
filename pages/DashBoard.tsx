@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 const DashboardPage: React.FC = () => {
   const [userFirstName, setUserFirstName] = useState('');
   const router = useRouter();
+  //const [userId, setUserId] = useState<string | null>(""); 
 
   const handleCreateResume = () => {
     router.push('/CreateResumePage');
@@ -14,8 +15,10 @@ const DashboardPage: React.FC = () => {
     const fetchUserDataFromDatabase = async () => {
       try {
         // Retrieve the user's ID from session storage
+        console.log("id=",sessionStorage.getItem('userId'))
         const userId = sessionStorage.getItem('userId');
-      
+        //setUserId(userId)
+        //sessionStorage.setItem('userId', userId);
         if (!userId) {
           throw new Error('User ID not found in session storage');
         }

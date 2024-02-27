@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 const CreateResumePage : React.FC = () => {
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<number |string| null>(null);
     const [skillInput, setSkillInput] = useState('');
     const [skills,setSkills] = useState<string[]> ([]);
     const [educationInput, setEducationInput] = useState({
@@ -36,6 +36,7 @@ const CreateResumePage : React.FC = () => {
                   throw new Error('User ID not found in session storage');
               }
               setUserId(storedUserId);
+              console.log('User ID bla bla bla:', storedUserId);
           } catch (error) {
               console.error('Error fetching user ID:', error);
           }
@@ -101,39 +102,50 @@ const CreateResumePage : React.FC = () => {
         setSummary(e.target.value);
     };
 
+   // Helper function to convert Date to ISO 8601 string
+    const toISOStringOrNull = (date: string | null): string | null => {
+      return date ? new Date(date).toISOString() : null;
+    };
+
     const handleSubmit = async () => {
-      
-      
       try {
-          const requestBody = {
-              userId,
-              skills,
-              education,
-              experiences,
-              summary
-          };
+        const requestBody = {
+          userId,
+          skills,
+          education,
+          experiences: experiences.map(exp => ({
+            ...exp,
+            startDate: toISOStringOrNull(experienceInput.startDate),
+            endDate: toISOStringOrNull(experienceInput.endDate),
+          })),
+          summary
+        };
 
-          const response = await axios.post('/api/addResumeData', requestBody);
+        const response = await axios.post('/api/addResumeData', requestBody);
 
-          if (!response.data.success) {
-              throw new Error('Failed to add resume data');
-          }
+        if (!response.data.success) {
+          throw new Error('Failed to add resume data');
+        }
 
-          // Reset form state after successful submission
-          setSkills([]);
-          setEducation([]);
-          setExperiences([]);
-          setSummary('');
-          setSummaryAiAssistance(false);
-          setShowSummaryInput(false);
+        // Reset form state after successful submission
+        setSkills([]);
+        setEducation([]);
+        setExperiences([]);
+        setSummary('');
+        setSummaryAiAssistance(false);
+        setShowSummaryInput(false);
 
-          // Optionally, redirect to another page after successful submission
-          // window.location.href = '/success-page';
+        // Optionally, redirect to another page after successful submission
+        // window.location.href = '/success-page';
       } catch (error) {
-          console.error('Error:', error);
-          // Handle error
+        console.error('Error:', error);
+        // Handle error
       }
-  };
+    };
+
+    
+    
+    
 
     return (
       <div className="container mx-auto py-8">
