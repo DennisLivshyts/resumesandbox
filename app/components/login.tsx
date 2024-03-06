@@ -30,7 +30,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupClick }) => {
       const userId = response.data.userId;
    
       // Assuming your API response includes the user ID
-      sessionStorage.setItem('userId', userId);
+      sessionStorage.setItem('userId', userId.toString());
       // Navigate to the dashboard
       router.push('/DashBoard');
     } catch (error) {

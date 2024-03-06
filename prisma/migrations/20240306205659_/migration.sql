@@ -35,7 +35,6 @@ CREATE TABLE "Skill" (
 CREATE TABLE "Experience" (
     "id" SERIAL NOT NULL,
     "resumeId" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
     "company" TEXT NOT NULL,
     "position" TEXT NOT NULL,
     "start" TIMESTAMP(3) NOT NULL,

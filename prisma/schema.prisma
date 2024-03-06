@@ -40,7 +40,6 @@ model Experience {
   id        Int       @id @default(autoincrement())
   resumeId  Int
   resume    Resume    @relation(fields: [resumeId], references: [id])
-  title     String 
   company   String
   position  String  
   start     DateTime

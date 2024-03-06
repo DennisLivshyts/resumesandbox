@@ -5,39 +5,38 @@ import { useRouter } from 'next/router';
 const DashboardPage: React.FC = () => {
   const [userFirstName, setUserFirstName] = useState('');
   const router = useRouter();
-  //const [userId, setUserId] = useState<string | null>(""); 
 
   const handleCreateResume = () => {
     router.push('/CreateResumePage');
   };
+
   useEffect(() => {
-    // Fetch user data when the component mounts
     const fetchUserDataFromDatabase = async () => {
       try {
-        // Retrieve the user's ID from session storage
-        console.log("id=",sessionStorage.getItem('userId'))
         const userId = sessionStorage.getItem('userId');
-        //setUserId(userId)
-        //sessionStorage.setItem('userId', userId);
+        console.log("User ID:", userId);
         if (!userId) {
           throw new Error('User ID not found in session storage');
         }
-        
-        // Fetch user data from the API route
+  
+        const fetchFirstName = router.query.userIdOnly !== 'true';
         const response = await axios.get(`/api/getUserData?userId=${userId}`);
         const userData = response.data;
-        
-        // Extract the user's first name
-        const firstName = userData.firstName;
-        setUserFirstName(firstName);
+        console.log("User Data:", userData);
+  
+        if (fetchFirstName) {
+          const firstName = userData.firstName;
+          console.log("User First Name:", firstName);
+          setUserFirstName(firstName);
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
-    
-    
+  
     fetchUserDataFromDatabase();
-  }, []);
+  }, [router.query.userIdOnly]);
+   // Re-run effect when userIdOnly query parameter changes
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-black text-white">

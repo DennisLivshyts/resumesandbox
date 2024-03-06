@@ -123,7 +123,7 @@ const CreateResumePage : React.FC = () => {
 
         const response = await axios.post('/api/addResumeData', requestBody);
 
-        if (!response.data.success) {
+        if (response.status !== 200) {
           throw new Error('Failed to add resume data');
         }
 

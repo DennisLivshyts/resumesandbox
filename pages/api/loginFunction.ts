@@ -34,11 +34,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       // Store user ID in the session
-   
       req.session.set('userId', user.id);
       await req.session.save();
- 
-      res.status(200).json({ token });
+
+      // Log user ID value and indicate it was added to session storage
+      console.log('User ID:', user.id, 'was successfully added to session storage');
+
+      res.status(200).json({ token, userId:user.id });
     } catch (error) {
       console.error('Error logging in:', error);
       res.status(500).json({ error: 'Failed to login' });

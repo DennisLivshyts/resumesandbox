@@ -1,12 +1,11 @@
-
-'../../app/backend/services/session'
+// ../../app/backend/services/session
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import withSession from "@/app/backend/services/session";
 
 const prisma = new PrismaClient()
 
-async function handler(req:NextApiRequest, res:NextApiResponse) {
+async function getUserData(req:NextApiRequest, res:NextApiResponse) {
   const userId = req.session.get("userId");
   
   if (!userId) {
@@ -14,12 +13,20 @@ async function handler(req:NextApiRequest, res:NextApiResponse) {
   }
 
   try {
-    const userData = await prisma.appUser.findUnique({
-      where: { id: Number(userId) },
-      select: { firstName: true }, 
-    });
+    // Check if it's a request for user data or just user ID
+    const userDataOnly = req.query.userIdOnly === 'true';
 
-    res.status(200).json(userData);
+    if (userDataOnly) {
+      // Return only the user ID
+      res.status(200).json({ id: userId });
+    } else {
+      // Retrieve user data
+      const userData = await prisma.appUser.findUnique({
+        where: { id: Number(userId) },
+        select: { firstName: true }, 
+      });
+      res.status(200).json(userData);
+    }
 
   } catch (error) {
     console.error(error);
@@ -27,4 +34,4 @@ async function handler(req:NextApiRequest, res:NextApiResponse) {
   }
 }
 
-export default withSession(handler);
+export default withSession(getUserData);
