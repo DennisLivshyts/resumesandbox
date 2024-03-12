@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import ResumeTemplateSlider from '../app/components/ResumeTemplateSlider';
 
 const CreateResumePage : React.FC = () => {
+    const [selectedTemplateId, setSelectedTemplateId] = useState(0);
     const [userId, setUserId] = useState<number |string| null>(null);
     const [skillInput, setSkillInput] = useState('');
     const [skills,setSkills] = useState<string[]> ([]);
@@ -122,6 +124,9 @@ const CreateResumePage : React.FC = () => {
         };
 
         const response = await axios.post('/api/addResumeData', requestBody);
+        const pdfResponse = await axios.get(`/api/generateResumePDF?userId=${userId}&templateId=${selectedTemplateId}`, {
+          responseType: 'blob',
+        });
 
         if (response.status !== 200) {
           throw new Error('Failed to add resume data');
@@ -403,6 +408,9 @@ const CreateResumePage : React.FC = () => {
       >
         Submit
       </button>
+      <div>
+      <ResumeTemplateSlider onTemplateSelect={(templateId) => setSelectedTemplateId(templateId)} />
+      </div>
     </div>
   );
 };

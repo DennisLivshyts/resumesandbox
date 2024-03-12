@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { userId, template } = req.query;
+  const { userId, templateId } = req.query;
 
   try {
     // Retrieve the user's resume data from the database
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Load the selected template HTML file
-    const templatePath = path.join(process.cwd(), 'templates', `${template}.html`);
+    const templatePath = path.join(process.cwd(), 'templates', `template${templateId}.html`);
     const templateHtml = fs.readFileSync(templatePath, 'utf-8');
 
     // Create a new browser instance
